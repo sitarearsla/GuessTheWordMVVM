@@ -1,17 +1,16 @@
 package com.sitare.guesstheword
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class GameViewModel : ViewModel() {
-    private var word = ""
-    private var score = 0
+    var word = " "//MutableLiveData<String>()
+    var score = MutableLiveData<Int>()
     private lateinit var wordList: MutableList<String>
 
-    fun score() = score
-    fun word() = word
-
     init {
+        score.value = 0
         Log.i("GameViewModel", "GameViewModel created")
         resetList()
         nextWord()
@@ -67,12 +66,14 @@ class GameViewModel : ViewModel() {
     /** Methods for buttons presses **/
 
     fun onSkip() {
-        score--
+        //null check minus operation
+        score.value = (score.value)?.minus(1)
         nextWord()
     }
 
     fun onCorrect() {
-        score++
+        //null safety operation
+        score.value = (score.value)?.plus(1)
         nextWord()
     }
 }
