@@ -44,10 +44,11 @@ class GameFragment : Fragment() {
             binding.wordText.text = newWord
         })
          */
-
+        /** DATA BINDING HANDLES THIS
         viewModel.timeLeft.observe(viewLifecycleOwner, Observer { newTime ->
             binding.timerText.text = newTime
         })
+         */
 
         viewModel.eventGameFinish.observe(viewLifecycleOwner, Observer { newEventGameFinish ->
             if (newEventGameFinish) {
