@@ -1,10 +1,15 @@
 package com.sitare.guesstheword
 
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.getSystemService
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -56,6 +61,14 @@ class GameFragment : Fragment() {
                 viewModel.onGameFinishComplete()
             }
         })
+
+        // Buzzes when triggered with different buzz events
+        viewModel.buzz.observe(viewLifecycleOwner, Observer { buzzType ->
+            if (buzzType != GameViewModel.BuzzType.NO_BUZZ) {
+                buzz(buzzType.pattern)
+                viewModel.onBuzzComplete()
+            }
+        })
         return binding.root
     }
 
@@ -68,4 +81,27 @@ class GameFragment : Fragment() {
         val action = GameFragmentDirections.actionGameToScore(viewModel.score.value ?: 0)
         NavHostFragment.findNavController(this).navigate(action)
     }
+
+    private fun buzz(pattern: LongArray) {
+        val buzzer = activity?.getSystemService<Vibrator>()
+
+        buzzer?.let {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                buzzer.vibrate(VibrationEffect.createWaveform(pattern, -1))
+                Log.i("Buzz", "if statement")
+            } else {
+                //deprecated in API 26
+                buzzer.vibrate(pattern, -1)
+                Log.i("Buzz", "else statement")
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                buzzer.vibrate(VibrationEffect.createWaveform(pattern, VibrationEffect.DEFAULT_AMPLITUDE))
+                Log.i("Buzzer", "if working")
+            } else {
+                Log.i("Buzzer", "else working")
+            }
+        }
+    }
+
 }
