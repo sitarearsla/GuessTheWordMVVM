@@ -35,6 +35,17 @@ class GameFragment : Fragment() {
         viewModel.word.observe(viewLifecycleOwner, Observer { newWord ->
             binding.wordText.text = newWord
         })
+
+        viewModel.timeLeft.observe(viewLifecycleOwner, Observer { newTime ->
+            binding.timerText.text = newTime
+        })
+
+        viewModel.eventGameFinish.observe(viewLifecycleOwner, Observer { newEventGameFinish ->
+            if (newEventGameFinish) {
+                gameFinished()
+                viewModel.onGameFinishComplete()
+            }
+        })
         return binding.root
     }
 

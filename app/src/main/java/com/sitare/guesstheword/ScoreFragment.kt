@@ -6,6 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.sitare.guesstheword.databinding.FragmentScoreBinding
@@ -13,15 +16,39 @@ import com.sitare.guesstheword.databinding.FragmentScoreBinding
 class ScoreFragment : Fragment() {
     private lateinit var binding: FragmentScoreBinding
 
+    // val viewmodel: ScoreViewModel by viewModels { ScoreViewModelFactory(score)} //With factory
+    private lateinit var viewModel: ScoreViewModel
+    private lateinit var viewModelFactory: ScoreViewModelFactory
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding =  DataBindingUtil.inflate(inflater, R.layout.fragment_score, container, false)
+        binding =  DataBindingUtil.inflate(
+            inflater,
+            R.layout.fragment_score,
+            container,
+            false)
         val scoreFragmentArgs by navArgs<ScoreFragmentArgs>()
-        val score = scoreFragmentArgs.score.toString()
-        binding.scoreText.text = score
-        binding.playAgainButton.setOnClickListener { onPlayAgain() }
+        val score = scoreFragmentArgs.score
+        viewModelFactory = ScoreViewModelFactory(score)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(ScoreViewModel::class.java)
+
+        binding.scoreText.text = score.toString()
+        binding.playAgainButton.setOnClickListener {
+            viewModel.onPlayAgain()
+        }
+
+        viewModel.score.observe(viewLifecycleOwner, { newScore ->
+            binding.scoreText.text = newScore
+        })
+
+        viewModel.eventPlayAgain.observe(viewLifecycleOwner, { playAgain ->
+           if (playAgain) {
+               onPlayAgain()
+               viewModel.onPlayAgainCompleted()
+           }
+        })
         return binding.root
     }
 
