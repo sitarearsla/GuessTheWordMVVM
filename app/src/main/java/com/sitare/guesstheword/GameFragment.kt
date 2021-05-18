@@ -21,20 +21,29 @@ class GameFragment : Fragment() {
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_game, container, false)
 
+        /** Done inside the XML via data binding
         binding.correctButton.setOnClickListener {
             viewModel.onCorrect()
         }
         binding.skipButton.setOnClickListener {
             viewModel.onSkip()
         }
+         */
 
+        binding.gameViewModel = viewModel
+        binding.lifecycleOwner = this
+
+        /** DATA BINDING HANDLES THIS
         viewModel.score.observe(viewLifecycleOwner, Observer { newScore ->
             binding.scoreText.text = newScore.toString()
         })
+         */
 
+        /** DATA BINDING HANDLES THIS
         viewModel.word.observe(viewLifecycleOwner, Observer { newWord ->
             binding.wordText.text = newWord
         })
+         */
 
         viewModel.timeLeft.observe(viewLifecycleOwner, Observer { newTime ->
             binding.timerText.text = newTime
@@ -54,7 +63,7 @@ class GameFragment : Fragment() {
      * Navigations should be made in the fragment
      */
     private fun gameFinished() {
-        //elvis operator, if null pass 0
+        //elvis operator: if null, pass 0
         val action = GameFragmentDirections.actionGameToScore(viewModel.score.value ?: 0)
         NavHostFragment.findNavController(this).navigate(action)
     }
